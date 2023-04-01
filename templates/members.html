@@ -10,6 +10,11 @@
             class="transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-700 duration-150 ease-in-out hover:bg-indigo-600 bg-indigo-700 rounded text-white px-8 py-2 text-sm"> <a href="/add-member">Add Member </a></button>
     </div>
 </div>
+{% if warning %}
+<div class="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4" role="alert">
+  <p>{{ warning }}</p>
+</div>
+{% endif %}
 {% if members%}
 <!-- component -->
 <table class="border-collapse w-full">
@@ -28,33 +33,36 @@
         {% for member in members %}
         <tr class="bg-white lg:hover:bg-gray-100 flex lg:table-row flex-row lg:flex-row flex-wrap lg:flex-no-wrap mb-10 lg:mb-0">
             <td class="w-full lg:w-auto p-3 text-gray-800 text-center border border-b block lg:table-cell relative lg:static">
-                <span class="lg:hidden absolute top-0 left-0 bg-blue-200 px-2 py-1 text-xs font-bold uppercase">ID</span>
+                <span class="lg:hidden absolute top-auto left-0 bg-blue-200 px-2 py-1 text-xs font-bold uppercase">ID</span>
                 {{member.id}}
             </td>
             <td class="w-full lg:w-auto p-3 text-gray-800 text-center border border-b text-center block lg:table-cell relative lg:static">
-                <span class="lg:hidden absolute top-0 left-0 bg-blue-200 px-2 py-1 text-xs font-bold uppercase">Name</span>
+                <span class="lg:hidden absolute top-auto left-0 bg-blue-200 px-2 py-1 text-xs font-bold uppercase">Name</span>
                 {{member.name}}
             </td>
           	<td class="w-full lg:w-auto p-3 text-gray-800 text-center border border-b text-center block lg:table-cell relative lg:static">
-                <span class="lg:hidden absolute top-0 left-0 bg-blue-200 px-2 py-1 text-xs font-bold uppercase">Email</span>
+                <span class="lg:hidden absolute top-auto left-0 bg-blue-200 px-2 py-1 text-xs font-bold uppercase">Email</span>
                 {{member.email}}
           	</td>
             <td class="w-full lg:w-auto p-3 text-gray-800 text-center border border-b text-center block lg:table-cell relative lg:static">
-                <span class="lg:hidden absolute top-0 left-0 bg-blue-200 px-2 py-1 text-xs font-bold uppercase">Registered On</span>
-                {{member.registered_on}}
+                <span class="lg:hidden absolute top-auto left-0 bg-blue-200 px-2 py-1 text-xs font-bold uppercase">Registered On</span>
+                <span class="pl-5">{{member.registered_on}}</span>
           	</td>
             <td class="w-full lg:w-auto p-3 text-gray-800 text-center border border-b text-center block lg:table-cell relative lg:static">
-                <span class="lg:hidden absolute top-0 left-0 bg-blue-200 px-2 py-1 text-xs font-bold uppercase">Debt</span>
+                <span class="lg:hidden absolute top-auto left-0 bg-blue-200 px-2 py-1 text-xs font-bold uppercase">Debt</span>
                 {{member.outstanding_debt}}
           	</td>
             <td class="w-full lg:w-auto p-3 text-gray-800 text-center border border-b text-center block lg:table-cell relative lg:static">
-                <span class="lg:hidden absolute top-0 left-0 bg-blue-200 px-2 py-1 text-xs font-bold uppercase">Amount Spent</span>
+                <span class="lg:hidden absolute top-auto left-0 bg-blue-200 px-2 py-1 text-xs font-bold uppercase">Amount Spent</span>
                 {{member.amount_spent}}
             </td>
-            <td class="w-full lg:w-auto p-3 text-gray-800 text-center border border-b text-center block lg:table-cell relative lg:static">
-                <span class="lg:hidden absolute top-0 left-0 bg-blue-200 px-2 py-1 text-xs font-bold uppercase">Actions</span>
-                <a href="#" class="text-white hover:bg-indigo-900 rounded bg-indigo-700 p-2 mx-2">Edit</a>
-                <a href="#" class="text-white hover:bg-red-900 rounded bg-red-700 p-2 mx-2">Remove</a>
+            <td class="w-full lg:w-auto p-3 text-gray-800 text-center border border-b text-center block lg:table-cell relative lg:static flex justify-center">
+                <span class="lg:hidden absolute top-auto left-0 bg-blue-200 px-2 py-1 text-xs font-bold uppercase">Actions</span>
+                <a  href="edit_member/{{member.id}}" class="text-white hover:bg-lime-400 rounded bg-green-600 mx-2 p-2 inline-flex mb-2">EDIT</a>
+                <form action="{{url_for('delete_member', id=member.id)}}" method="POST"
+                onsubmit="confirm('Are you sure you want to delete this member?');">
+                <input type="submit" value="DELETE" class="text-white hover:bg-red-900 rounded bg-red-700 p-2 mx-2 inline-flex ">
+            </form>
             </td>
         </tr>
         {% endfor %}

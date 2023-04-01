@@ -7,6 +7,7 @@ from wtforms import Form, validators, StringField, FloatField, IntegerField, Dat
 
 
 app = Flask(__name__)
+app.secret_key = "sushilpundkar"
 
 #mysql config
 app.config['MYSQL_HOST'] = 'localhost'
@@ -69,8 +70,83 @@ def add_member():
 
         # Close DB Connection
         cur.close()
-        
+
+        # Flash Success Message
+        flash("New Member Added", "success")
+
+        # Redirect to show all members
         return redirect(url_for('members'))    
     return render_template('addMember.html', form=form)
+
+# Delete Member by ID
+@app.route('/delete_member/<string:id>', methods=['POST'])
+def delete_member(id):
+
+    # Create MySQLCursor
+    cur = mysql.connection.cursor()
+    # Since deleting parent row can cause a foreign key constraint to fail
+    try:
+        # Execute SQL Query
+        cur.execute("DELETE FROM members WHERE id=%s", [id])
+
+        # Commit to DB
+        mysql.connection.commit()
+    except (MySQLdb.Error, MySQLdb.Warning) as e:
+        print(e)
+        # Flash Failure Message
+        flash("Member could not be deleted", "danger")
+        flash(str(e), "danger")
+
+        # Redirect to show all members
+        return redirect(url_for('members'))
+    finally:
+        # Close DB Connection
+        cur.close()
+
+    # Flash Success Message
+    flash("Member Deleted", "success")
+
+    # Redirect to show all members
+    return redirect(url_for('members'))
+
+# Edit Member by ID
+@app.route('/edit_member/<string:id>', methods=['GET', 'POST'])
+def edit_member(id):
+    # Get form data from request
+    form = MemberForm(request.form)
+
+    # To handle POST request to route
+    if request.method == 'POST' and form.validate():
+        name = form.name.data
+        email = form.email.data
+
+        # Create MySQLCursor
+        cur = mysql.connection.cursor()
+
+        # Execute SQL Query
+        cur.execute(
+            "UPDATE members SET name=%s, email=%s WHERE id=%s", (name, email, id))
+
+        # Commit to DB
+        mysql.connection.commit()
+
+        # Close DB Connection
+        cur.close()
+
+        # Flash Success Message
+        flash("Member Updated", "success")
+
+        # Redirect to show all members
+        return redirect(url_for('members'))
+
+           # To handle GET request to route
+
+    # To get existing field values of selected member
+    cur2 = mysql.connection.cursor()
+    result = cur2.execute("SELECT name,email FROM members WHERE id=%s", [id])
+    member = cur2.fetchone()
+    # To render edit member form
+    return render_template('editMember.html', form=form, member=member)
+
 if __name__ == '__main__':
-  app.run(debug=True)
+    app.run(debug=True)
