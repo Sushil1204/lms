@@ -1,9 +1,10 @@
+from crypt import methods
 from flask import Flask, flash, render_template, url_for, redirect, request
 import requests 
 from flask_mysqldb import MySQL
 import MySQLdb
 from wtforms import Form, validators, StringField, FloatField, IntegerField, DateField, SelectField
-
+import urllib
 
 app = Flask(__name__)
 app.secret_key = "sushilpundkar"
@@ -16,6 +17,7 @@ app.config['MYSQL_PASSWORD'] = 'Sushil@1204'
 app.config['MYSQL_PORT'] = 3306
 app.config['MYSQL_DB'] = 'library'
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
+app.config['MYSQL_SQL_MODE'] = 'NO_ZERO_DATE,NO_ZERO_IN_DATE'
 
 # Initialise MYSQL
 mysql = MySQL(app)
@@ -184,6 +186,9 @@ class BookForm(Form):
     publisher = StringField('Publisher', [validators.Length(min=2, max=255)])
     total_quantity = IntegerField(
         'Total No. of Books', [validators.NumberRange(min=1)])
+    no_of_books = IntegerField('No. of Books*', [validators.NumberRange(min=1)])
+    quantity_per_book = IntegerField(
+        'Quantity Per Book*', [validators.NumberRange(min=1)])
 
 @app.route('/add_book', methods=['GET', 'POST'])
 def add_book():
@@ -248,8 +253,8 @@ def viewBook(id):
     # Execute SQL Query
     result = cur.execute("SELECT * FROM books WHERE id=%s", [id])
     book = cur.fetchone()
-    print(book)
 
+    cur.close()
     # Render Template
     if result > 0:
         return render_template('bookDetails.html', book=book)
@@ -258,7 +263,113 @@ def viewBook(id):
         return render_template('bookDetails.html', warning=msg)
 
     # Close DB Connection
-    cur.close()
+
+class ImportBooks(Form):
+    no_of_books = IntegerField('No. of Books*', [validators.NumberRange(min=1)])
+    quantity_per_book = IntegerField(
+        'Quantity Per Book*', [validators.NumberRange(min=1)])
+    title = StringField(
+        'Title', [validators.Optional(), validators.Length(min=2, max=255)])
+    author = StringField(
+        'Author(s)', [validators.Optional(), validators.Length(min=2, max=255)])
+    isbn = StringField(
+        'ISBN', [validators.Optional(), validators.Length(min=10, max=10)])
+    publisher = StringField(
+        'Publisher', [validators.Optional(), validators.Length(min=2, max=255)])
+
+
+# Import Books from Frappe API
+@app.route('/import_books', methods=['GET','POST'])
+def importBooks():
+    #get form data from request
+    form = ImportBooks(request.form)
+
+    #To handle Post request 
+    if request.method == 'POST' and form.validate():
+        # Create request structure    
+        url  = 'https://frappe.io/api/method/frappe-library?'
+        parameters = {'page': 1}
+
+        if form.title.data:
+            parameters['title'] = form.title.data
+        if form.author.data:
+            parameters['author'] = form.author.data
+        if form.isbn.data:
+            parameters['isbn'] = form.isbn.data
+        if form.publisher.data:
+            parameters['publisher'] = form.publisher.data
+
+        # Create MySQLCursor
+        cur = mysql.connection.cursor()
+
+        # loops and requests
+        books_imported = 0
+        repeated_book_ids = []
+        while (books_imported != form.no_of_books.data):
+            r = requests.get(url + urllib.parse.urlencode(parameters))
+            res = r.json()
+
+            #break if message is empty
+            if not res['message']:
+                break
+
+            for book in res['message']:
+                result = cur.execute("SELECT id FROM books WHERE id=%s", [book['bookID']]) # check if book with same id already exists
+                book_found = cur.fetchone()
+
+                if(not book_found):
+                     # Execute SQL Query
+                    cur.execute("INSERT INTO books (id,title,author,average_rating,isbn,isbn13,language_code,num_pages,ratings_count,text_reviews_count,publication_date,publisher,total_quantity,available_quantity) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", [
+                        book['bookID'],
+                        book['title'],
+                        book['authors'],
+                        book['average_rating'],
+                        book['isbn'],
+                        book['isbn13'],
+                        book['language_code'],
+                        book['  num_pages'],
+                        book['ratings_count'],
+                        book['text_reviews_count'],
+                        book['publication_date'].format('YYYY-MM-DD'),
+                        book['publisher'],
+                        form.quantity_per_book.data,
+                        # When a book is first added, available_quantity = total_quantity
+                        form.quantity_per_book.data
+                    ])
+                    books_imported += 1
+                    if books_imported == form.no_of_books.data:
+                        break
+                else:
+                    repeated_book_ids.append(book['bookID'])
+            parameters['page'] = parameters['page'] + 1
+
+            # Commit to DB
+        mysql.connection.commit()
+
+        # Close DB Connection
+        cur.close()
+
+        # Flash Success/Warning Message
+        msg = str(books_imported) + "/" + \
+            str(form.no_of_books.data) + " books have been imported. "
+        msgType = 'success'
+        if books_imported != form.no_of_books.data:
+            msgType = 'warning'
+            if len(repeated_book_ids) > 0:
+                msg += str(len(repeated_book_ids)) + \
+                    " books were found with already exisiting IDs."
+            else:
+                msg += str(form.no_of_books.data - books_imported) + \
+                    " matching books were not found."
+
+        flash(msg, msgType)
+
+        # Redirect to show all books
+        return redirect(url_for('books'))
+
+    # To handle GET request to route
+    return render_template('importBooks.html', form=form)
+
 
 if __name__ == '__main__':
     app.jinja_env.auto_reload = True
