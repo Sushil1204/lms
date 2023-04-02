@@ -1,0 +1,75 @@
+{% extends 'layout.html' %}
+{% block body %}
+
+<div class="h-full w-full py-16 px-4">
+    <div class="flex flex-col items-center justify-center">
+        <div
+            class="bg-white shadow rounded p-10 mt-16 border-2 border-solid border-indigo-700 w-fit">
+            <p tabindex="0" class="focus:outline-none text-2xl font-extrabold leading-6 text-gray-800 mb-4">Add Book
+            </p>
+            {% from "includes/formHelper.html" import render_field %}
+            <form method="POST" action="">
+                <div class="grid lg:grid-rows-4 lg:grid-flow-col gap-4">
+                    <div class="mt-6">
+                        {{render_field(form.id, class_="border rounded outline-none text-xl font-medium leading-none
+                        text-gray-800 py-3 w-full pl-3 mt-2")}}
+                    </div>
+                    <div class="mt-6">
+                        {{render_field(form.title, class_="border rounded outline-none text-xl font-medium leading-none
+                        text-gray-800 py-3 w-full pl-3 mt-2")}}
+                    </div>
+                    <div class="mt-6">
+                        {{render_field(form.author, class_="border rounded outline-none text-xl font-medium leading-none
+                        text-gray-800 py-3 w-full pl-3 mt-2")}}
+                    </div>
+                    <div class="mt-6">
+                        {{render_field(form.average_rating, class_="border rounded outline-none text-xl font-medium leading-none
+                        text-gray-800 py-3 w-full pl-3 mt-2")}}
+                    </div>
+                    <div class="mt-6">
+                        {{render_field(form.isbn, class_="border rounded outline-none text-xl font-medium leading-none
+                        text-gray-800 py-3 w-full pl-3 mt-2")}}
+                    </div>
+                    <div class="mt-6">
+                        {{render_field(form.isbn13, class_="border rounded outline-none text-xl font-medium leading-none
+                        text-gray-800 py-3 w-full pl-3 mt-2")}}
+                    </div>
+                    <div class="mt-6">
+                        {{render_field(form.language_code, class_="border rounded outline-none text-xl font-medium leading-none
+                        text-gray-800 py-3 w-full pl-3 mt-2")}}
+                    </div>
+                    <div class="mt-6">
+                        {{render_field(form.num_pages, class_="border rounded outline-none text-xl font-medium leading-none
+                        text-gray-800 py-3 w-full pl-3 mt-2")}}
+                    </div>
+                    <div class="mt-6">
+                        {{render_field(form.ratings_count, class_="border rounded outline-none text-xl font-medium leading-none
+                        text-gray-800 py-3 w-full pl-3 mt-2")}}
+                    </div>
+                    <div class="mt-6">
+                        {{render_field(form.text_reviews_count, class_="border rounded outline-none text-xl font-medium leading-none
+                        text-gray-800 py-3 w-full pl-3 mt-2")}}
+                    </div>
+                    <div class="mt-6">
+                        {{render_field(form.publication_date, type="date", class_="border rounded outline-none text-xl font-medium leading-none
+                        text-gray-800 py-3 w-full pl-3 mt-2")}}
+                    </div>
+                    <div class="mt-6">
+                        {{render_field(form.publisher, class_="border rounded outline-none text-xl font-medium leading-none
+                        text-gray-800 py-3 w-full pl-3 mt-2")}}
+                    </div>
+                    <div class="mt-6">
+                        {{render_field(form.total_quantity, class_="border rounded outline-none text-xl font-medium leading-none
+                        text-gray-800 py-3 w-full pl-3 mt-2")}}
+                    </div>
+                    <div class="mt-14">
+                        <button role="button" value="submit"
+                            class="focus:ring-2 focus:ring-offset-2 focus:ring-indigo-700 text-sm font-semibold leading-none text-white focus:outline-none bg-indigo-700 border rounded hover:bg-indigo-600 py-4 w-full">Submit</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,103 @@
+{% extends 'layout.html' %}
+{% block body %}
+<div
+    class="my-6 lg:my-12 px-6 flex flex-col md:flex-row items-start md:items-center justify-between pb-4 border-b border-gray-300">
+    <div>
+        <h4 class="text-2xl font-bold leading-tight text-gray-800">Book details</h4>
+    </div>
+    <div class="mt-6 md:mt-0">
+        <button
+            class="transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-700 duration-150 ease-in-out hover:bg-indigo-600 bg-indigo-700 rounded text-white px-8 py-2 text-sm">
+            <a href="/add_book">Edit book </a></button>
+    </div>
+</div>
+{% if warning %}
+<div class="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4" role="alert">
+    <p>{{ warning }}</p>
+</div>
+{% endif %}
+{% if book%}
+<table class="border-separate border-spacing-2 lg:w-full table-right">
+    <tbody class="">
+    <tr>
+        <td class="w-full lg:w-auto p-3 text-gray-800 border border-indigo-700 text-left block lg:table-cell relative lg:static">
+            Book ID
+        </td>
+        <td class="w-full lg:w-auto p-3 text-gray-800 border border-indigo-700 text-left block lg:table-cell relative lg:static">
+            {{book.id}}
+        </td>
+        <td class="w-full lg:w-auto p-3 text-gray-800 border border-indigo-700 text-left block lg:table-cell relative lg:static">
+            Book Title
+        </td>
+        <td class="w-full lg:w-auto p-3 text-gray-800 border border-indigo-700 text-left block lg:table-cell relative lg:static">
+           {{book.title}}
+        </td>
+    </tr>
+    <tr>
+        <td class="w-full lg:w-auto p-3 text-gray-800 border border-indigo-700 text-left block lg:table-cell relative lg:static">Author</td>
+        <td class="w-full lg:w-auto p-3 text-gray-800 border border-indigo-700 text-left block lg:table-cell relative lg:static">
+           {{book.author}}
+        </td>
+        <td class="w-full lg:w-auto p-3 text-gray-800 border border-indigo-700 text-left block lg:table-cell relative lg:static">Avearge rating</td>
+        <td class="w-full lg:w-auto p-3 text-gray-800 border border-indigo-700 text-left block lg:table-cell relative lg:static">
+            {{book.average_rating}}
+        </td>
+    </tr>
+    <tr>
+        <td class="w-full lg:w-auto p-3 text-gray-800 border border-indigo-700 text-left block lg:table-cell relative lg:static">ISBN</td>
+        <td class="w-full lg:w-auto p-3 text-gray-800 border border-indigo-700 text-left block lg:table-cell relative lg:static">
+            {{book.isbn}}
+        </td>
+        <td class="w-full lg:w-auto p-3 text-gray-800 border border-indigo-700 text-left block lg:table-cell relative lg:static">ISBN13</td>
+        <td class="w-full lg:w-auto p-3 text-gray-800 border border-indigo-700 text-left block lg:table-cell relative lg:static">
+           {{book.isbn13}} 
+        </td>
+    </tr>
+    <tr>
+        <td class="w-full lg:w-auto p-3 text-gray-800 border border-indigo-700 text-left block lg:table-cell relative lg:static">Language</td>
+        <td class="w-full lg:w-auto p-3 text-gray-800 border border-indigo-700 text-left block lg:table-cell relative lg:static">
+           {{book.language_code}}
+        </td>
+        <td class="w-full lg:w-auto p-3 text-gray-800 border border-indigo-700 text-left block lg:table-cell relative lg:static">No.of pages</td>
+        <td class="w-full lg:w-auto p-3 text-gray-800 border border-indigo-700 text-left block lg:table-cell relative lg:static">
+           {{book.num_pages}} 
+        </td>
+    </tr>
+    <tr>
+        <td class="w-full lg:w-auto p-3 text-gray-800 border border-indigo-700 text-left block lg:table-cell relative lg:static">Ratings</td>
+        <td class="w-full lg:w-auto p-3 text-gray-800 border border-indigo-700 text-left block lg:table-cell relative lg:static">
+           {{book.ratings_count}}
+        </td>
+        <td class="w-full lg:w-auto p-3 text-gray-800 border border-indigo-700 text-left block lg:table-cell relative lg:static">Reviews</td>
+        <td class="w-full lg:w-auto p-3 text-gray-800 border border-indigo-700 text-left block lg:table-cell relative lg:static">
+           {{book.text_reviews_count}}
+        </td>
+    </tr>
+    <tr>
+        <td class="w-full lg:w-auto p-3 text-gray-800 border border-indigo-700 text-left block lg:table-cell relative lg:static">Publication date</td>
+        <td class="w-full lg:w-auto p-3 text-gray-800 border border-indigo-700 text-left block lg:table-cell relative lg:static">
+           {{book.publication_date}} 
+        </td>
+        <td class="w-full lg:w-auto p-3 text-gray-800 border border-indigo-700 text-left block lg:table-cell relative lg:static">Publisher</td>
+        <td class="w-full lg:w-auto p-3 text-gray-800 border border-indigo-700 text-left block lg:table-cell relative lg:static">
+           {{book.publisher}} 
+        </td>
+    </tr>
+    <tr>
+        <td class="w-full lg:w-auto p-3 text-gray-800 border border-indigo-700 text-left block lg:table-cell relative lg:static">Total Quantity</td>
+        <td class="w-full lg:w-auto p-3 text-gray-800 border border-indigo-700 text-left block lg:table-cell relative lg:static">
+           {{book.total_quantity}} 
+        </td>
+        <td class="w-full lg:w-auto p-3 text-gray-800 border border-indigo-700 text-left block lg:table-cell relative lg:static">Rented Quanted</td>
+        <td class="w-full lg:w-auto p-3 text-gray-800 border border-indigo-700 text-left block lg:table-cell relative lg:static">
+            {{book.rented_count}} 
+         </td>
+    </tr>
+    <tr>
+        <td class="w-full lg:w-auto p-3 text-gray-800 border border-indigo-700 text-left block lg:table-cell relative lg:static">Available Quantity</td>
+        <td class="w-full lg:w-auto p-3 text-gray-800 border border-indigo-700 text-left block lg:table-cell relative lg:static">{{book.available_quantity}}</td>
+    </tr>
+    </tbody>
+</table>
+{% endif %}
+{% endblock %}
