@@ -1,4 +1,5 @@
 from crypt import methods
+from datetime import datetime
 from flask import Flask, flash, render_template, url_for, redirect, request
 import requests 
 from flask_mysqldb import MySQL
@@ -564,8 +565,79 @@ def issue_book():
     # To handle GET request to route
     return render_template('issueBook.html', form=form)
 
-    
+#return book form
+class ReturnBook(Form):
+    amount_paid = FloatField('Amount Paid', [validators.NumberRange(min=0)])
 
+#Return book by trancation id
+@app.route('/return_book/<string:transaction_id>', methods=['GET','POST'])
+def returnBook(transaction_id):
+    #Get the book data from the request
+    form = ReturnBook(request.form)
+
+    #mysql cursor
+    cur = mysql.connection.cursor()
+
+    # to get existing values of selected transaction
+    cur.execute("SELECT * from transactions where id=%s",[transaction_id])
+    transaction = cur.fetchone()
+
+    #calculate billing
+    date = datetime.now()
+    diff = date - transaction['borrowed_on']
+    diff = diff.days
+    total_charge = diff * transaction['per_day_fee']
+
+    #handling post request
+    if request.method == 'POST' and form.validate():
+        transaction_debt = total_charge - form.amount_paid.data
+
+        # Check if bill amount exceets Rs.500
+        cur.execute("SELECT outstanding_debt,amount_spent FROM members WHERE id=%s", [
+                    transaction['member_id']])
+        result = cur.fetchone()
+        outstanding_debt = result['outstanding_debt']
+        amount_spent = result['amount_spent']
+        if(outstanding_debt + transaction_debt > 500):
+            error = 'Outstanding debt cannot exceed Rs.500'
+            return render_template('returnBook.html', form=form, error=error)
+
+        # update return date, total charges and amount paid for this transacation 
+        cur.execute("UPDATE transactions SET returned_on=%s,total_charge=%s,amount_paid=%s WHERE id=%s", [
+            date,
+            total_charge,
+            form.amount_paid.data,
+            transaction_id
+        ])
+
+        # Update outstanding_debt and amount_spent for this member
+        cur.execute("UPDATE members SET outstanding_debt=%s, amount_spent=%s WHERE id=%s", [
+            outstanding_debt+transaction_debt,
+            amount_spent+form.amount_paid.data,
+            transaction['member_id']
+        ])
+
+        # Update available_quantity for this book
+        cur.execute(
+            "UPDATE books SET available_quantity=available_quantity+1 WHERE id=%s", [transaction['book_id']])
+
+        # Commit to DB
+        mysql.connection.commit()
+
+        # Close DB Connection
+        cur.close()
+
+        # Flash Success Message
+        flash("Book Returned", "success")
+
+        # Redirect to show all transactions
+        return redirect(url_for('transactions'))
+
+    # To handle GET request to route
+    return render_template('returnBook.html', form=form, total_charge=total_charge, difference=diff, transaction=transaction)
+
+
+    
 if __name__ == '__main__':
     app.jinja_env.auto_reload = True
     app.config['TEMPLATES_AUTO_RELOAD'] = True
