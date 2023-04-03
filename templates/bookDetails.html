@@ -1,5 +1,6 @@
 {% extends 'layout.html' %}
 {% block body %}
+{% if book%}
 <div
     class="my-6 lg:my-12 px-6 flex flex-col md:flex-row items-start md:items-center justify-between pb-4 border-b border-gray-300">
     <div>
@@ -8,7 +9,7 @@
     <div class="mt-6 md:mt-0">
         <button
             class="transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-700 duration-150 ease-in-out hover:bg-indigo-600 bg-indigo-700 rounded text-white px-8 py-2 text-sm">
-            <a href="/add_book">Edit book </a></button>
+            <a href="/edit_book/{{book.id}}">Edit book </a></button>
     </div>
 </div>
 {% if warning %}
@@ -16,7 +17,6 @@
     <p>{{ warning }}</p>
 </div>
 {% endif %}
-{% if book%}
 <table class="border-separate border-spacing-2 w-full table-right">
     <tbody>
         <tr>

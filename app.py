@@ -117,6 +117,7 @@ def edit_member(id):
     # Get form data from request
     form = MemberForm(request.form)
 
+    print(request.method == 'POST' and form.validate())
     # To handle POST request to route
     if request.method == 'POST' and form.validate():
         name = form.name.data
@@ -186,10 +187,7 @@ class BookForm(Form):
     publisher = StringField('Publisher', [validators.Length(min=2, max=255)])
     total_quantity = IntegerField(
         'Total No. of Books', [validators.NumberRange(min=1)])
-    no_of_books = IntegerField('No. of Books*', [validators.NumberRange(min=1)])
-    quantity_per_book = IntegerField(
-        'Quantity Per Book*', [validators.NumberRange(min=1)])
-
+   
 @app.route('/add_book', methods=['GET', 'POST'])
 def add_book():
     # Get form data from request
@@ -370,6 +368,70 @@ def importBooks():
     # To handle GET request to route
     return render_template('importBooks.html', form=form)
 
+
+#Edit book by ID
+@app.route('/edit_book/<string:id>', methods=['GET','POST'])
+def editBook(id):
+      # Get form data from request
+    form = BookForm(request.form)
+
+    # Create MySQLCursor
+    cur = mysql.connection.cursor()
+
+    # To get existing values of selected book
+    result = cur.execute("SELECT * FROM books WHERE id=%s", [id])
+    book = cur.fetchone()
+
+    # To handle POST request to route
+    if request.method == 'POST' and form.validate():
+        # Check if book with same ID already exists (if ID field is being edited)
+        if(form.id.data != id):
+            result = cur.execute(
+                "SELECT id FROM books WHERE id=%s", [form.id.data])
+            book = cur.fetchone()
+            if(book):
+                error = 'Book with that ID already exists'
+                return render_template('editBook.html', form=form, error=error, book=form.data)
+
+        # Calculate new available_quantity (No. of books available to be rented)
+        available_quantity = book['available_quantity'] + \
+            (form.total_quantity.data - book['total_quantity'])
+
+        # Execute SQL Query
+        cur.execute("UPDATE books SET id=%s,title=%s,author=%s,average_rating=%s,isbn=%s,isbn13=%s,language_code=%s,num_pages=%s,ratings_count=%s,text_reviews_count=%s,publication_date=%s,publisher=%s,total_quantity=%s,available_quantity=%s WHERE id=%s", [
+            form.id.data,
+            form.title.data,
+            form.author.data,
+            form.average_rating.data,
+            form.isbn.data,
+            form.isbn13.data,
+            form.language_code.data,
+            form.num_pages.data,
+            form.ratings_count.data,
+            form.text_reviews_count.data,
+            form.publication_date.data,
+            form.publisher.data,
+            form.total_quantity.data,
+            available_quantity,
+            id])
+
+        # Commit to DB
+        mysql.connection.commit()
+
+        # Close DB Connection
+        cur.close()
+
+        # Flash Success Message
+        flash("Book Updated", "success")
+
+        # Redirect to show all books
+        return redirect(url_for('books'))
+
+    # To handle GET request to route
+    # To render edit book form
+    return render_template('editBook.html', form=form, book=book)
+
+    
 
 if __name__ == '__main__':
     app.jinja_env.auto_reload = True
