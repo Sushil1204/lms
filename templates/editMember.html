@@ -10,11 +10,11 @@
             {% from "includes/formHelper.html" import render_field %}
             <form method="POST" action="">
                 <div>
-                    {{render_field(form.name, class_="border rounded outline-none text-xl font-medium leading-none
+                    {{render_field(form.name, class="border rounded outline-none text-xl font-medium leading-none
                     text-gray-800 py-3 w-full pl-3 mt-2", value=member.name)}}
                 </div>
                 <div class="mt-6">
-                    {{render_field(form.email,type=email, class_="border rounded outline-none text-xl font-medium leading-none
+                    {{render_field(form.email,type=email, class="border rounded outline-none text-xl font-medium leading-none
                     text-gray-800 py-3 w-full pl-3 mt-2", value=member.email)}}
                 </div>
                 <div class="mt-8">

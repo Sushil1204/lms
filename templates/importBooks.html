@@ -11,32 +11,32 @@
             <form method="POST" action="">
                 <div class="grid lg:grid-rows-3 lg:grid-flow-col gap-4">
                     <div class="mt-6">
-                        {{render_field(form.no_of_books, class_="border rounded outline-none text-xl font-medium leading-none
+                        {{render_field(form.no_of_books, class="border rounded outline-none text-xl font-medium leading-none
                         text-gray-800 py-3 w-full pl-3 mt-2")}}
                     </div>
                     <div class="mt-6">
-                        {{render_field(form.quantity_per_book,class_="border rounded outline-none text-xl font-medium leading-none
+                        {{render_field(form.quantity_per_book,class="border rounded outline-none text-xl font-medium leading-none
                         text-gray-800 py-3 w-full pl-3 mt-2")}}
                     </div>
                     <div class="mt-6">
-                        {{render_field(form.title, class_="border rounded outline-none text-xl font-medium leading-none
+                        {{render_field(form.title, class="border rounded outline-none text-xl font-medium leading-none
                         text-gray-800 py-3 w-full pl-3 mt-2")}}
                     </div>
                     <div class="mt-6">
-                        {{render_field(form.author,class_="border rounded outline-none text-xl font-medium leading-none
+                        {{render_field(form.author,class="border rounded outline-none text-xl font-medium leading-none
                         text-gray-800 py-3 w-full pl-3 mt-2")}}
                     </div>
                     <div class="mt-6">
-                        {{render_field(form.isbn, class_="border rounded outline-none text-xl font-medium leading-none
+                        {{render_field(form.isbn, class="border rounded outline-none text-xl font-medium leading-none
                         text-gray-800 py-3 w-full pl-3 mt-2")}}
                     </div>
                     <div class="mt-6">
-                        {{render_field(form.publisher,class_="border rounded outline-none text-xl font-medium leading-none
+                        {{render_field(form.publisher,class="border rounded outline-none text-xl font-medium leading-none
                         text-gray-800 py-3 w-full pl-3 mt-2")}}
                     </div>
                 </div>
                 <div class="mt-8">
-                    <button role="button" value="submit"
+                    <button type="submit" value="submit"
                         class="focus:ring-2 focus:ring-offset-2 focus:ring-indigo-700 text-sm font-semibold leading-none text-white focus:outline-none bg-indigo-700 border rounded hover:bg-indigo-600 py-4 w-full">Submit</button>
                 </div>
             </form>
