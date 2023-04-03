@@ -431,6 +431,38 @@ def editBook(id):
     # To render edit book form
     return render_template('editBook.html', form=form, book=book)
 
+# Delete Book by ID
+@app.route('/delete_book/<string:id>', methods=['POST'])
+def bookDelete(id):
+    # Create MySQLCursor
+    cur = mysql.connection.cursor()
+
+    # Since deleting parent row can cause a foreign key constraint to fail
+    try:
+        # Execute SQL Query
+        cur.execute("DELETE FROM books WHERE id=%s", [id])
+
+        # Commit to DB
+        mysql.connection.commit()
+    except (MySQLdb.Error, MySQLdb.Warning) as e:
+
+        print(e)
+        # Flash Failure Message
+        flash("Book could not be deleted", "danger")
+        flash(str(e), "danger")
+
+        # Redirect to show all members
+        return redirect(url_for('books'))
+    finally:
+        # Close DB Connection
+        cur.close()
+
+    # Flash Success Message
+    flash("Book Deleted", "success")
+
+    # Redirect to show all books
+    return redirect(url_for('books'))
+
     
 
 if __name__ == '__main__':

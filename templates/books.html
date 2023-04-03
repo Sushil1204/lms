@@ -90,7 +90,7 @@
                     class="lg:hidden absolute top-0 left-0 bg-transparent px-2 py-1 text-xs font-bold uppercase">Actions</span>
                 <a href="book-details/{{book.id}}" class="text-white hover:bg-green-900 rounded bg-green-700 p-2">VIEW</a>
                 <a href="edit_book/{{book.id}}" class="text-white hover:bg-green-900 rounded bg-green-700 p-2">EDIT</a>
-                <form action="{{url_for('delete_member', id=book.id)}}" method="POST" class="inline-flex"
+                <form action="{{url_for('bookDelete', id=book.id)}}" method="POST" class="inline-flex"
                     onsubmit="confirm('Are you sure you want to delete this book?');">
                     <input type="submit" value="DELETE" class="text-white hover:bg-red-900 rounded bg-red-700 p-2">
                 </form>
