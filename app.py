@@ -679,6 +679,34 @@ def searchBook():
     return render_template('searchBook.html', form=form)
 
 
+# Reports
+@app.route('/reports')
+def reports():
+    # Create MySQLCursor
+    cur = mysql.connection.cursor()
+
+    # Execute SQL Query to get 5 highest paying customers
+    result_members = cur.execute(
+        "SELECT id,name,amount_spent FROM members ORDER BY amount_spent DESC LIMIT 5")
+    members = cur.fetchall()
+
+    # Execute SQL Query to get 5 most popular books
+    result_books = cur.execute(
+        "SELECT id,title,author,total_quantity,available_quantity,rented_count FROM books ORDER BY rented_count DESC LIMIT 5")
+    books = cur.fetchall()
+
+    cur.close()
+    # Render Template
+    msg = ''
+    if result_members <= 0:
+        msg = 'No Members Found. '
+    if result_books <= 0:
+        msg = msg+'No Books Found'
+    return render_template('reports.html', members=members, books=books, warning=msg)
+
+    # Close DB Connection
+
+
     
 if __name__ == '__main__':
     app.jinja_env.auto_reload = True
