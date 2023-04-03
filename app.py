@@ -463,6 +463,107 @@ def bookDelete(id):
     # Redirect to show all books
     return redirect(url_for('books'))
 
+
+# Transactions
+@app.route('/transactions')
+def transactions():
+     # Create MySQLCursor
+    cur = mysql.connection.cursor()
+
+    # Execute SQL Query
+    result = cur.execute("SELECT * FROM transactions")
+    transactions = cur.fetchall()
+
+    # To handle empty fields
+    for transaction in transactions:
+        for key, value in transaction.items():
+            if value is None:
+                transaction[key] = "-"
+
+    # Render Template
+    if result > 0:
+        return render_template('transactions.html', transactions=transactions)
+    else:
+        msg = 'No Transactions Found'
+        return render_template('transactions.html', warning=msg)
+
+    # Close DB Connection
+    cur.close()
+
+# Define Issue-Book-Form
+class IssueBook(Form):
+    book_id = SelectField('Book ID', choices=[])
+    member_id = SelectField('Member ID', choices=[])
+    per_day_fee = FloatField('Per Day Renting Fee', [
+                             validators.NumberRange(min=1)])
+
+#Issue Book
+@app.route('/issue_book', methods=['GET', 'POST'])
+def issue_book():
+    # Get form data from request
+    form = IssueBook(request.form)
+
+    # Create MySQLCursor
+    cur = mysql.connection.cursor()
+
+    # Create choices list for SelectField in form
+    cur.execute("SELECT id, title FROM books")
+    books = cur.fetchall()
+    book_ids_list = []
+    for book in books:
+        t = (book['id'], book['title'])
+        book_ids_list.append(t)
+
+    cur.execute("SELECT id, name FROM members")
+    members = cur.fetchall()
+    member_ids_list = []
+    for member in members:
+        t = (member['id'], member['name'])
+        member_ids_list.append(t)
+
+    form.book_id.choices = book_ids_list
+    form.member_id.choices = member_ids_list
+
+    # To handle POST request to route
+    if request.method == 'POST' and form.validate():
+
+        # Get the no of books available to be rented
+        cur.execute("SELECT available_quantity FROM books WHERE id=%s", [
+                    form.book_id.data])
+        result = cur.fetchone()
+        available_quantity = result['available_quantity']
+
+        # Check if book is available to be rented/issued
+        if(available_quantity < 1):
+            error = 'No copies of this book are availabe to be rented'
+            return render_template('issueBook.html', form=form, error=error)
+
+        # Execute SQL Query to create transaction
+        cur.execute("INSERT INTO transactions (book_id,member_id,per_day_fee) VALUES (%s, %s, %s)", [
+            form.book_id.data,
+            form.member_id.data,
+            form.per_day_fee.data,
+        ])
+
+        # Update available quantity, rented count of book
+        cur.execute(
+            "UPDATE books SET available_quantity=available_quantity-1, rented_count=rented_count+1 WHERE id=%s", [form.book_id.data])
+
+        # Commit to DB
+        mysql.connection.commit()
+
+        # Close DB Connection
+        cur.close()
+
+        # Flash Success Message
+        flash("Book Issued", "success")
+
+        # Redirect to show all transactions
+        return redirect(url_for('transactions'))
+
+    # To handle GET request to route
+    return render_template('issueBook.html', form=form)
+
     
 
 if __name__ == '__main__':

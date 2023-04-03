@@ -1,0 +1,85 @@
+{% extends 'layout.html' %}
+{% block body %}
+<div
+    class="my-6 lg:my-12 px-6 flex flex-col md:flex-row items-start md:items-center justify-between pb-4 border-b border-gray-300">
+    <div>
+        <h4 class="text-2xl font-bold leading-tight text-gray-800">Transactions</h4>
+    </div>
+    <div class="mt-6 md:mt-0">
+       <button
+            class="transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-700 duration-150 ease-in-out hover:bg-indigo-600 bg-indigo-700 rounded text-white px-8 py-2 text-sm"> <a href="/issue_book">Issue Book </a></button>
+    </div>
+</div>
+{% if warning %}
+<div class="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4" role="alert">
+  <p>{{ warning }}</p>
+</div>
+{% endif %}
+{% if transactions%}
+<!-- component -->
+<table class="border-collapse w-full">
+    <thead>
+        <tr>
+            <th class="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">Transactions ID</th>
+            <th class="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">Book ID</th>
+            <th class="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">transaction ID</th>
+            <th class="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">Per Day Renting Fee</th>
+            <th class="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">Borrowed On</th>
+            <th class="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">Returned On</th>
+            <th class="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">Total Charge</th>
+            <th class="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">Amount Paid</th>
+            <th class="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for transaction in transactions %}
+        <tr class="bg-white lg:hover:bg-gray-100 flex lg:table-row flex-row lg:flex-row flex-wrap lg:flex-no-wrap mb-10 lg:mb-0">
+            <td class="w-full lg:w-auto p-3 text-gray-800 text-center border border-b block lg:table-cell relative lg:static">
+                <span class="lg:hidden absolute top-auto left-0 bg-blue-200 px-2 py-1 text-xs font-bold uppercase">Transactions ID</span>
+                {{transaction.id}}
+            </td>
+            <td class="w-full lg:w-auto p-3 text-gray-800 text-center border border-b text-center block lg:table-cell relative lg:static">
+                <span class="lg:hidden absolute top-auto left-0 bg-blue-200 px-2 py-1 text-xs font-bold uppercase">Book ID</span>
+                {{transaction.book_id}}
+            </td>
+          	<td class="w-full lg:w-auto p-3 text-gray-800 text-center border border-b text-center block lg:table-cell relative lg:static">
+                <span class="lg:hidden absolute top-auto left-0 bg-blue-200 px-2 py-1 text-xs font-bold uppercase">transaction ID</span>
+                {{transaction.member_id}}
+          	</td>
+            <td class="w-full lg:w-auto p-3 text-gray-800 text-center border border-b text-center block lg:table-cell relative lg:static">
+                <span class="lg:hidden absolute top-auto left-0 bg-blue-200 px-2 py-1 text-xs font-bold uppercase">Per Day Renting Fee</span>
+                <span class="pl-5">{{transaction.per_day_fee}}</span>
+          	</td>
+            <td class="w-full lg:w-auto p-3 text-gray-800 text-center border border-b text-center block lg:table-cell relative lg:static">
+                <span class="lg:hidden absolute top-auto left-0 bg-blue-200 px-2 py-1 text-xs font-bold uppercase">Borrowed On</span>
+                {{transaction.borrowed_on}}
+          	</td>
+            <td class="w-full lg:w-auto p-3 text-gray-800 text-center border border-b text-center block lg:table-cell relative lg:static">
+                <span class="lg:hidden absolute top-auto left-0 bg-blue-200 px-2 py-1 text-xs font-bold uppercase">Returned On</span>
+                {{transaction.returned_on}}
+            </td>
+            <td class="w-full lg:w-auto p-3 text-gray-800 text-center border border-b text-center block lg:table-cell relative lg:static">
+                <span class="lg:hidden absolute top-auto left-0 bg-blue-200 px-2 py-1 text-xs font-bold uppercase">Total Charge</span>
+                {{transaction.total_charge}}
+            </td>
+            <td class="w-full lg:w-auto p-3 text-gray-800 text-center border border-b text-center block lg:table-cell relative lg:static">
+                <span class="lg:hidden absolute top-auto left-0 bg-blue-200 px-2 py-1 text-xs font-bold uppercase">Amount Paid</span>
+                {{transaction.amount_paid}}
+            </td>
+            {% if transaction.amount_paid=='-' %}
+            <td class="w-full lg:w-auto p-3 text-gray-800 text-center border border-b text-center block lg:table-cell relative lg:static">
+                <span class="lg:hidden absolute top-auto left-0 bg-blue-200 px-2 py-1 text-xs font-bold uppercase">Actions</span>
+                <a  href="return_book/{{transaction.id}}" class="text-white hover:bg-lime-400 rounded bg-green-600 mx-2 p-2 inline-flex mb-2">RETURN</a>
+            </td>
+            {% else %}
+            <td class="w-full lg:w-auto p-3 text-gray-800 text-center border border-b text-center block lg:table-cell relative lg:static">
+                <span class="lg:hidden absolute top-auto left-0 bg-blue-200 px-2 py-1 text-xs font-bold uppercase">Actions</span>
+                <p class="text-white hover:bg-lime-400 rounded bg-green-600 mx-2 p-2 inline-flex mb-2">Closed</p>
+            </td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+{% endblock %}
