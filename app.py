@@ -637,6 +637,48 @@ def returnBook(transaction_id):
     return render_template('returnBook.html', form=form, total_charge=total_charge, difference=diff, transaction=transaction)
 
 
+# Define Search-Form
+class BookSearch(Form):
+    title = StringField('Title', [validators.Length(min=2, max=255)])
+    author = StringField('Author(s)', [validators.Length(min=2, max=255)])
+
+#Search Book Route
+@app.route('/search_book', methods=['GET','POST'])
+def searchBook():
+ # Get form data from request
+    form = BookSearch(request.form)
+
+    # To handle POST request to route
+    print(form.data)
+    if request.method == 'POST' and form.validate():
+        # Create MySQLCursor
+        cur = mysql.connection.cursor()
+        title = '%'+form.title.data+'%'
+        author = '%'+form.author.data+'%'
+        # Check if books exists
+        result = cur.execute(
+            "SELECT * FROM books WHERE title LIKE %s OR author LIKE %s", [title, author])
+        books = cur.fetchall()
+        # Close DB Connection
+        cur.close()
+
+        # Flash Success Message
+        if result <= 0:
+            msg = 'No Results Found'
+            return render_template('searchBook.html', form=form, warning=msg)
+
+         # Flash Success/Warning Message
+        msg = str(result) + " books have been found. "
+        msgType = 'success'
+
+        flash(msg, msgType)
+        # Render template with search results
+        return render_template('searchBook.html', form=form, books=books)
+
+    # To handle GET request to route
+    return render_template('searchBook.html', form=form)
+
+
     
 if __name__ == '__main__':
     app.jinja_env.auto_reload = True
