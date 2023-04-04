@@ -28,32 +28,12 @@ mysql = MySQL(app)
 def index():
     return render_template('index.html')
 
-@app.route("/members")
-def members():
-    # Create MySQLCursor
-    cur = mysql.connection.cursor()
-
-    # Execute SQL Query
-    result = cur.execute("SELECT * FROM members")
-    members = cur.fetchall()
-
-    # Render Template
-    if result > 0:
-        return render_template('members.html', members=members)
-    else:
-        msg = 'No Members Found'
-        return render_template('members.html', warning=msg)
-
-    # Close DB Connection
-    cur.close()
-
 class MemberForm(Form):
     name = StringField('Name', [validators.length(min=3, max=50)])
     email = StringField('Email', [validators.length(min=6, max=50)])
 
-@app.route("/add-member", methods=['GET', 'POST'])
-def add_member():
-    # Get form data from request
+@app.route("/members", methods=['GET', 'POST'])
+def members():
     form = MemberForm(request.form)
 
      # To handle POST request to route
@@ -77,9 +57,22 @@ def add_member():
         # Flash Success Message
         flash("New Member Added", "success")
 
-        # Redirect to show all members
-        return redirect(url_for('members'))    
-    return render_template('addMember.html', form=form)
+        return redirect(url_for('members'))
+
+    # cursor for getting memebers from db
+    cur2 = mysql.connection.cursor()
+    
+    # Execute SQL Query
+    result = cur2.execute("SELECT * FROM members")
+    members = cur2.fetchall()
+
+    # Render Template
+    if result > 0:
+        return render_template('members.html', members=members, form=form)
+    else:
+        msg = 'No Members Found'
+        return render_template('members.html', warning=msg)
+
 
 # Delete Member by ID
 @app.route('/delete_member/<string:id>', methods=['POST'])
@@ -666,14 +659,15 @@ def searchBook():
         if result <= 0:
             msg = 'No Results Found'
             return render_template('searchBook.html', form=form, warning=msg)
-
+        
          # Flash Success/Warning Message
         msg = str(result) + " books have been found. "
         msgType = 'success'
 
         flash(msg, msgType)
-        # Render template with search results
+
         return render_template('searchBook.html', form=form, books=books)
+        # Render template with search results
 
     # To handle GET request to route
     return render_template('searchBook.html', form=form)
